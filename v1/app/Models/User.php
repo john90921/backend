@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens; // Add this line
+
+class User extends Authenticatable
+{
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+
+    use HasFactory, Notifiable, HasApiTokens; // Add this line
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'email',
+        'password',
+        'role',
+        'email_verified_at',
+        'otp'
+    ];
+
+    protected $table = 'users';
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    public function profile(){
+        return $this->hasOne(profile::class);
+    }
+    public function worker(){
+        return $this->hasOne(worker::class);
+    }
+    public function posts(){
+        return $this->hasMany(post::class);
+}
+    public function likes(){
+        return $this->hasMany(like::class);
+    }
+    public function comments(){
+        return $this->hasMany(comment::class);
+    }
+    public function replies(){
+        return $this->hasMany(reply::class);
+    }
+    public function tageReplies(){
+        return $this->hasMany(reply::class,'taged_user_id');
+    }
+
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+}
