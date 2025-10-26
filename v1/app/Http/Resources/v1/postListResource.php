@@ -25,6 +25,7 @@ class postListResource extends JsonResource
             'is_liked' => (bool) $this->is_liked,
             'likes_count' => $this->total_likes,
             'comments_count' => $this->comments_count ?? 0,
+            'owner_id' => $this->user->id,
             'owner_name' => $this->user->profile?->name ?? null,
             'owner_image' => $this->user->profile?->profile_image ? asset('storage/' . $this->user->profile->profile_image) : null,
         ];

@@ -16,11 +16,37 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return post::paginate(10);
+        return $request->user()->posts()->paginate(10);
     }
 
+    public function retrievePostById(Request $request){
+        $data = $request->validate([
+            'post_id' => 'required|integer',
+        ]);
+
+        $post = post::query()
+            ->with('user.profile')
+            ->withCount(["likes as is_liked" => function ($query) use ($request){ $query->where("user_id", $request->user()->id);}])
+            ->withCount("likes as total_likes")
+            ->withCount("comments as comments_count")
+            ->find($data['post_id']);
+
+        if (!$post) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Post not found',
+                'data' => null
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Post retrieved successfully',
+            'data' => new postListResource($post)
+        ], 200);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -28,6 +54,74 @@ class PostController extends Controller
     public function create()
     {
         //
+    }
+
+    public function communityPosts(Request $request){
+
+        $todayPosts = post::query();
+
+        if($request->has('date')){
+        if( $request->date == 'today'){
+            $todayPosts->whereDate('created_at', Carbon::today());
+        }
+        if( $request->date == 'week'){
+            $todayPosts->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+        }
+        if( $request->date =='month'){
+            $todayPosts->whereMonth('created_at', Carbon::now()->month);
+        }
+        if( $request->date == 'year'){
+            $todayPosts->whereYear('created_at', Carbon::now()->year);
+        }
+    }
+
+      $todayPosts->with('user.profile')
+        ->withCount(["likes as is_liked" => function ($query) use ($request){ $query->where("user_id", $request->user()->id);}])
+        ->withCount("likes as total_likes")
+        ->withCount("comments as comments_count");// Eager load the user relationship // get the post owner user info
+
+        if($request->has('sortBy')){
+        if($request->sortBy == 'latest'){
+
+        $todayPosts->orderBy('created_at', 'desc');
+
+        }
+        if($request->sortBy == 'popular'){
+        $todayPosts->orderBy('total_likes', 'desc');
+        }
+
+
+    }
+
+ if($request->has('searchInput')){
+        $search = $request->searchInput;
+
+         $todayPosts->where('title', 'same', "%{$search}%")
+              ->orWhere('content', 'like', "%{$search}%");
+        }
+
+    if($request->has('userId')){
+        $todayPosts->where('user_id', $request->userId);
+    }
+       $todayPosts = $todayPosts->paginate(6);
+        // $todayPosts= post::where('id',217)->get();
+    return
+        response()->json(
+            [
+                'message' => 'success',
+                'status' => true,
+                'data' => postListResource::collection(   $todayPosts),
+                'pagination' => [
+                    'total' => $todayPosts->total(),
+                    'per_page' => $todayPosts->perPage(),
+                    'current_page' => $todayPosts->currentPage(),
+                    'last_page' => $todayPosts->lastPage(),
+                    'from' => $todayPosts->firstItem(),
+                    'to' => $todayPosts->lastItem(),
+                ]
+                ],200
+            );
+
     }
 
     public function todayPosts(Request $request){
@@ -41,7 +135,7 @@ class PostController extends Controller
         ->orderBy('created_at', 'desc')
         ->paginate(6);
         // $todayPosts= post::where('id',217)->get();
-        return
+    return
         response()->json(
             [
                 'message' => 'success',
@@ -70,7 +164,7 @@ class PostController extends Controller
         $data = $request->validate([
             'title' => 'required|string',
             'content' => 'required|string',
-            'image' =>'sometimes|required|image|mimes:jpeg,png,jpg,gif,svg|max:2048|dimensions:max_width=3000,max_height=3000',
+            'image' =>'sometimes|nullable',
         ]);
 
         if ($request->hasFile('image') || $request->file('image')!= null ) {
@@ -87,7 +181,7 @@ class PostController extends Controller
             'image' => $image_uploaded_path,
             'user_id' => $request->user()->id
            ]);
-            return response()->json(['status' => true,'message' => 'Comment created successfully','data' =>new postListResource($post)], 201);
+            return response()->json(['status' => true,'message' => 'post created successfully','data' =>new postListResource($post)], 201);
 
         } catch (\Exception $e) {
             return response()->json(['status' => false,'message' => $e->getMessage(),'data' => null], 500);
@@ -127,10 +221,16 @@ class PostController extends Controller
             $data = $request->validate([
             'title' => 'sometimes|required|string',
             'content' => 'sometimes|required|string',
-            'image' =>'sometimes|nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048|dimensions:max_width=3000,max_height=3000',
+            'image' =>'sometimes|nullable',
             'remove_image' => 'sometimes|required',
         ]);
 
+        if($request->remove_image == 'true'){
+            // if($post->image != null){
+            //     Storage::disk('public')->delete($post->image);
+            // }
+            $post->image = null;
+        }
 
         if ($request->hasFile('image')) {
         $uploadFolder = 'posts';
@@ -142,14 +242,7 @@ class PostController extends Controller
 
         $post->update($data);
 
-        if ($request->has('remove_image') &&  $data["remove_image"] == true) {
 
-             if (Storage::disk('public')->exists($post->image)) {
-            Storage::disk('public')->delete($post->image);
-        }
-         $post->image = null;
-            $post->save();
-        }
         $newPost = post::with('user.profile')
             ->withCount(["likes as is_liked" => function ($query) use ($request){ $query->where("user_id", $request->user()->id);}])
             ->withCount("likes as total_likes")
@@ -184,11 +277,11 @@ class PostController extends Controller
     public function destroy(post $post)
     {
         try{
-            if ($post->image) {
-        if (Storage::disk('public')->exists($post->image)) {
-            Storage::disk('public')->delete($post->image);
-        }
-    }
+    //         if ($post->image) {
+    //     if (Storage::disk('public')->exists($post->image)) {
+    //         Storage::disk('public')->delete($post->image);
+    //     }
+    // }
             $post->delete();
 
             return response()->json([

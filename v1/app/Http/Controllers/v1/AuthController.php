@@ -25,7 +25,7 @@ class AuthController extends Controller
             'status' => false
         ], 200);
         }
-        $user->tokens()->delete();
+        
 
         $token  = $user->createToken('mobile')->plainTextToken; // get the token
 
@@ -34,22 +34,13 @@ class AuthController extends Controller
     }
     public function logout(Request $request)
     {
-        try{
+
        $request->user()->tokens()->delete();
         return response()->json([
                 'message' => "Logged out successfully",
                 'status' => true,
 
               ], 200);
-         } catch (\Exception $e) {
-          return response()->json([
-                'message' => $e->getMessage(),
-                'status' => false,
-
-              ], 500);
-
-         }
-
     }
 
 

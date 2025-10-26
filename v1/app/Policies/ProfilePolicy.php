@@ -11,12 +11,7 @@ class ProfilePolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function modify(User $user,profile $profile)
-    {
-        return $user->id === $profile->user_id
-            ? Response::allow()
-            : Response::deny('You do not own this profile.');
-    }
+
     public function viewAny(User $user): bool
     {
         return false;

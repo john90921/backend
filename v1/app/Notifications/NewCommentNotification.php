@@ -32,17 +32,17 @@ class NewCommentNotification extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    public function toDatabase($notifiable): array
+    public function toDatabase($notifiable): array // send to database
     {
         return [
             'type' =>'comment',
-            'title' => 'New Comment on Your Post',
+            'title' => $this->comment->user->profile->name . ' has New Comment on Your Post',
             'message' => 'Someone has commented on your post.',
             'comment_id' => $this->comment->id,
             'post_id' => $this->comment->post_id,
             'comment_content' => $this->comment->content,
             'actor_id' => $this->comment->user->id,
-            'actor_name' => $this->comment->user->name,
+            'actor_name' => $this->comment->user->profile->name,
         ];
     }
 

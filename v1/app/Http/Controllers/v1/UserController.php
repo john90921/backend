@@ -8,15 +8,34 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Mail\WelcomeEmail;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Resources\v1\userResource;
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    // public function index(Request $request)
+    // {
+    //     return User::paginate(10);
+    // }
+    public function getLoginUserInfo(Request $request)
     {
-        return User::all();
+        $user = $request->user();
+
+        if($user != null){
+           return  response()->json([
+            'status' => true,
+            'message' => 'user retrieved successfully',
+            'data' => new userResource($user)
+           ]);
         }
+        return response()->json([
+            'status' => false,
+            'message' => 'No authenticated user',
+            'data' => null
+        ], 401);
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -31,19 +50,20 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+    try{
         $data = $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|email|max:255|unique:users',
-            'role' => 'required|string|in:worker,manager',
-            'department' => 'sometimes|string',
+            'password' => 'required|string',
+
         ]);
-        $randomPassword = Str::random(12);
-        $randomPassword = 'password';
+
+        // $randomPassword = Str::random(12);
+        $password = $data['password'];
         $userData =[
             'name' =>  $data['name'],
             'email' => $data['email'],
-            'password' => Hash::make($randomPassword),
-            'role' => $data['role'],
+            'password' => Hash::make($password),
             'department' => $data['department'] ?? 'general',
         ];
 
@@ -61,11 +81,19 @@ class UserController extends Controller
                 ]
             );
         }
-
-        Mail::to($user->email)->send(new WelcomeEmail($user, $randomPassword));
+          $token  = $user->createToken('mobile')->plainTextToken;
+        // Mail::to($user->email)->send(new WelcomeEmail($user, $password));
         return response()->json([
-            'user' => $user
+            'status' => true,
+            'message' => 'User created successfully',
+            'data' => ['token'=>$token,'user'=>new userResource($user->load('profile'))],
         ]);
+    }catch(\Exception $e){
+            return response()->json([
+            'status' => false,
+            'message' => 'Server error: ' . $e->getMessage(),
+        ], 500);
+    }
     }
 
     /**
@@ -90,7 +118,7 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
-            'email' => 'sometimes|required|string|email|max:255|unique:users',
+            'name' => 'sometimes|required|string|email|max:255|unique:users',
             'password' => 'sometimes|required|string',
             'role' => 'sometimes|required|string|in:staff,manager',
         ]);

@@ -58,9 +58,9 @@ class CommentController extends Controller
 
         $postOwner = $comment->post->user;
 
-        if($postOwner){
-            $postOwner->notify(new NewCommentNotification($comment));
-        }
+
+        $postOwner->notify(new NewCommentNotification($comment));
+
         $newComment = comment::with('user.profile')
         ->withCount(["likes as is_liked" => function ($query) use ($request){ $query->where("user_id", $request->user()->id);}])
         ->withCount("likes as total_likes")
@@ -116,9 +116,20 @@ class CommentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatecommentRequest $request, comment $comment)
+    public function update(Request $request, comment $comment)
     {
-        //
+        try{
+            $data = $request->validate([
+            'content' => 'required|string',
+        ]);
+        $comment->update([
+            'content' => $data['content'],
+        ]);
+        return response()->json(['status' => true,'message' => 'Comment updated successfully','data' =>  new commentListResource($comment)], 200);
+
+    } catch (\Exception $e) {
+        return response()->json(['status' => false,'message' => 'Comment not updated successfully', 'error' => $e->getMessage()], 500);
+    }
     }
 
     /**

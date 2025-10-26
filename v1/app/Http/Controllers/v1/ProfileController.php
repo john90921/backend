@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\v1;
 use App\Http\Resources\v1\profileResource;
 use App\Models\profile;
+
 use App\Http\Requests\StoreprofileRequest;
 use App\Http\Requests\UpdateprofileRequest;
 use App\Http\Controllers\v1\Controller;
+use App\Http\Resources\v1\userResource;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 
@@ -17,8 +19,8 @@ class ProfileController extends Controller
      */
     public function index(Request $request)
     {
-        $personal_profile = $request->user()->profile()->get(); // get the profile of the authenticated user
-        return $personal_profile;
+        $personal_profile = $request->user()->profile; // get the profile of the authenticated user
+        return new profileResource($personal_profile);
     }
 
     /**
@@ -67,20 +69,32 @@ class ProfileController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateprofileRequest $request, profile $profile)
+    public function update(Request $request, profile $profile)
     {
-        $profile_data = $request->all();
+        $data = $request->validate([
+            'name' => 'sometimes|required|string',
+            'description' =>'sometimes|nullable|string',
+            'profile_image' => 'sometimes|nullable',
+            'remove_image' => 'sometimes|required',
+        ]);
+           if($request->remove_image == 'true'){
+            // if($post->image != null){
+            //     Storage::disk('public')->delete($post->image);
+            // }
+            $profile->profile_image = null;
+        }
         if($request->hasFile('profile_image')){//check if image present
             $uploadFolder = 'profiles';  //folder name
-        $image = $request->file('profile_image'); // get image // if text, than use $request->all(), if file, use $request->file('key')
+            $image = $request->file('profile_image'); // get image // if text, than use $request->all(), if file, use $request->file('key')
             $image_uploaded_path = $image->store($uploadFolder, 'public'); // store image in public disk (storage/app/public)
-            $profile['profile_image'] = $image_uploaded_path;
+            $data['profile_image'] = $image_uploaded_path;
         }
 
-     $request->user()->profile()->update($profile_data);
+    $profile->update($data);
      return response()->json([
+        'status' => true,
         'message' => 'Profile updated successfully',
-        'profile' => $profile
+        'data' => new userResource( $request->user())
      ], 200);
     }
 

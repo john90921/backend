@@ -26,6 +26,7 @@ class ProfileFactory extends Factory
         return [
             'name' => fake()->name(),
             'profile_image' => fake()->randomElement($images),
+            'description' => fake()->sentence(),
             'phone' => fake()->phoneNumber(),
             'user_id' => User::factory(),
         ];

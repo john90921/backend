@@ -14,6 +14,7 @@ class profile extends Model
         'name',
         'profile_image',
         'phone',
+        'description',
         'user_id',
     ];
 

@@ -274,4 +274,10 @@
             <div class="h-14.5 hidden lg:block"></div>
         @endif
     </body>
+    <script>
+    Echo.channel('channel')
+    .listen('PublicMessageSent', (event) => {
+        console.log('New message:', event.message);
+    });
+    </script>
 </html>

@@ -17,7 +17,7 @@ return new class extends Migration
                     ->references('id')
                     ->on('users')
                     ->onDelete('cascade');
-
+            $table->string('description')->nullable();
             $table->string('name');
             $table->string('profile_image')->nullable();
             $table->string('phone')->nullable();

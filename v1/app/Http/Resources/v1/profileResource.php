@@ -17,11 +17,10 @@ class profileResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'description' => $this->description,
             'profile_image' => $this->profile_image // check if profile_image is not null
-            ? asset('storage/' . $this->profile_image) // if you want to return full URL // make it to become http://127.0.0.1:8000/storage/profile/avatar.png
+            ? asset('storage/' . $this->profile_image): null, // if you want to return full URL // make it to become http://127.0.0.1:8000/storage/profile/avatar.png
 
-        : null,
-            'phone' => $this->phone,
         ];
     }
 
