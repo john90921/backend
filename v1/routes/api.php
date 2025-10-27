@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Broadcast;
 use App\Events\PrivateMessageSent;
 use App\Http\Controllers\v1\NotificationController;
 use App\Http\Controllers\v1\UserController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -22,8 +24,26 @@ Route::group(
     ['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\v1'],
 function () {
         Route::resource('profile', 'ProfileController')->middleware('auth:sanctum');
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $user = \App\Models\User::find($request->route('id'));
 
-        Route::resource('user', 'UserController');
+    if (! $user) {
+        return response()->json(['message' => 'Invalid user'], 404);
+    }
+
+    if (! hash_equals((string) $hash = sha1($user->getEmailForVerification()), (string) $request->route('hash'))) {
+        return response()->json(['message' => 'Invalid verification link'], 400);
+    }
+
+    if ($user->hasVerifiedEmail()) {
+        return response()->json(['message' => 'Already verified']);
+    }
+
+    $user->markEmailAsVerified();
+
+    return response()->json(['message' => 'Email verified successfully']);
+})->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+        Route::resource('user', 'UserController')->middleware('auth:sanctum');
         Route::resource('post', 'PostController')->middleware(middleware: 'auth:sanctum');
         Route::post('retrievePostById', action: [PostController::class, 'retrievePostById'])->middleware('auth:sanctum');
 
@@ -34,6 +54,8 @@ function () {
         Route::post('unreadCount', action: [NotificationController::class, 'getUnreadCount'])->middleware('auth:sanctum');
         Route::post('markAsRead', action: [NotificationController::class, 'markAsRead'])->middleware('auth:sanctum');
         Route::get('getLoginUserInfo', [UserController::class, 'getLoginUserInfo'])->middleware('auth:sanctum');
+
+        Route::post('register', [UserController::class, 'register']);
 
         Route::post('login', [AuthController::class, 'login'])->name('login');;
         Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');

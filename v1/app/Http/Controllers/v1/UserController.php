@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 use App\Mail\WelcomeEmail;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Resources\v1\userResource;
+use App\Mail\OtpEmail;
+
 class UserController extends Controller
 {
     /**
@@ -50,6 +52,53 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+    // try{
+    //     $data = $request->validate([
+    //         'name' => 'required|string',
+    //         'email' => 'required|string|email|max:255|unique:users',
+    //         'password' => 'required|string',
+
+    //     ]);
+
+    //     // $randomPassword = Str::random(12);
+    //     $password = $data['password'];
+    //     $userData =[
+    //         'name' =>  $data['name'],
+    //         'email' => $data['email'],
+    //         'password' => Hash::make($password),
+    //         'department' => $data['department'] ?? 'general',
+    //     ];
+
+    //     $user = User::create( $userData );
+
+    //     $user->profile()->create(
+    //         [
+    //              'name' => $request->name
+    //         ]
+    //     );
+    //     if($request->role == 'worker'){
+    //         $user->worker()->create(
+    //             [
+    //                 'department' => $request->department ?? 'general',
+    //             ]
+    //         );
+    //     }
+    //       $token  = $user->createToken('mobile')->plainTextToken;
+    //     // Mail::to($user->email)->send(new WelcomeEmail($user, $password));
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'User created successfully',
+    //         'data' => ['token'=>$token,'user'=>new userResource($user->load('profile'))],
+    //     ]);
+    // }catch(\Exception $e){
+    //         return response()->json([
+    //         'status' => false,
+    //         'message' => 'Server error: ' . $e->getMessage(),
+    //     ], 500);
+    // }
+    }
+     public function register(Request $request)
+    {
     try{
         $data = $request->validate([
             'name' => 'required|string',
@@ -57,23 +106,30 @@ class UserController extends Controller
             'password' => 'required|string',
 
         ]);
-
         // $randomPassword = Str::random(12);
+        if($data['email'])
+
         $password = $data['password'];
-        $userData =[
+        // $userData = [
+        //     'name' =>  $data['name'],
+        //     'email' => $data['email'],
+        //     'password' => Hash::make($password),
+        //     'department' => $data['department'] ?? 'general',
+        // ];
+
+        $user = User::create( [
             'name' =>  $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($password),
             'department' => $data['department'] ?? 'general',
-        ];
-
-        $user = User::create( $userData );
-
+        ] );
         $user->profile()->create(
             [
                  'name' => $request->name
             ]
         );
+
+
         if($request->role == 'worker'){
             $user->worker()->create(
                 [
@@ -81,28 +137,40 @@ class UserController extends Controller
                 ]
             );
         }
-          $token  = $user->createToken('mobile')->plainTextToken;
-        // Mail::to($user->email)->send(new WelcomeEmail($user, $password));
+        $otp = rand(1000, 9999); // 4-digit OTP
+
+        $user->otp = $otp;
+
+        $user->save();
+        Mail::to($user->email)->send( new OtpEmail(otp: $otp));
+
+        //   $token  = $user->createToken('mobile')->plainTextToken;
+        // // Mail::to($user->email)->send(new WelcomeEmail($user, $password));
+        // return response()->json([
+        //     'status' => true,
+        //     'message' => 'User created successfully',
+        //     'data' => ['token'=>$token,'user'=>new userResource($user->load('profile'))],
+        // ]);
         return response()->json([
             'status' => true,
-            'message' => 'User created successfully',
-            'data' => ['token'=>$token,'user'=>new userResource($user->load('profile'))],
+            'message' => 'User created successfully, OTP sent to email for verification',
+
         ]);
     }catch(\Exception $e){
             return response()->json([
             'status' => false,
-            'message' => 'Server error: ' . $e->getMessage(),
-        ], 500);
+            'message' => $e->getMessage(),
+        ], );
     }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
-    {
-        return $user;
-    }
+    // public function show(User $user)
+    // {
+    //     return $user;
+    // }
 
     /**
      * Show the form for editing the specified resource.
@@ -115,16 +183,16 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
-    {
-        $data = $request->validate([
-            'name' => 'sometimes|required|string|email|max:255|unique:users',
-            'password' => 'sometimes|required|string',
-            'role' => 'sometimes|required|string|in:staff,manager',
-        ]);
+    // public function update(Request $request, User $user)
+    // {
+    //     $data = $request->validate([
+    //         'name' => 'sometimes|required|string|email|max:255|unique:users',
+    //         'password' => 'sometimes|required|string',
+    //         'role' => 'sometimes|required|string|in:staff,manager',
+    //     ]);
 
-        $user->update($data);
-    }
+    //     $user->update($data);
+    // }
 
     /**
      * Remove the specified resource from storage.

@@ -19,14 +19,27 @@ class AuthController extends Controller
         ]);
         $user = User::where('email', strtolower($credentials['email']))->first(); // get the user based one email
 
+
         if(!$user || !Hash::check($credentials["password"],$user->password)){
             return response()->json([
             'message' => 'invalid credentials',
             'status' => false
         ], 200);
         }
-        
 
+         if(!$user->hasVerifiedEmail()){
+        $otp = rand(1000, 9999); // 4-digit OTP
+
+        $user->otp = $otp;
+
+        $user->save();
+        Mail::to($user->email)->send( new OtpEmail(otp: $otp));
+            return response()->json([
+                'message' => 'unverified',
+                'status' => false
+            ], 200);
+        
+        }
         $token  = $user->createToken('mobile')->plainTextToken; // get the token
 
 
@@ -74,6 +87,7 @@ class AuthController extends Controller
         ]);
         $user = User::where('email',operator: $credentials["email"])->first();
         if($user->otp == $credentials["otp"]){
+            $user->markEmailAsVerified();
             $user->otp = null;
             $user->save();
             return response()->json(['status'=> true,'message' => 'OTP submitted successfully'],200);// get the user based one email
