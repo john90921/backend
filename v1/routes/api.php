@@ -17,8 +17,8 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-Route::post('login', [AuthController::class, 'login'])->name('login');;
-Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+// Route::post('login', [AuthController::class, 'login'])->name('login');;
+// Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::group(
     ['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\v1'],
@@ -49,7 +49,7 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
 
         Route::resource('comment', 'CommentController')->middleware('auth:sanctum');
         Route::resource('reply', 'ReplyController')->middleware('auth:sanctum');
-
+        Route::resource('plant', 'PlantController');
         Route::resource('notification', 'NotificationController')->middleware('auth:sanctum');
         Route::post('unreadCount', action: [NotificationController::class, 'getUnreadCount'])->middleware('auth:sanctum');
         Route::post('markAsRead', action: [NotificationController::class, 'markAsRead'])->middleware('auth:sanctum');

@@ -62,6 +62,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function tageReplies(){
         return $this->hasMany(reply::class,'taged_user_id');
     }
+    public function plants()
+    {
+        return $this->hasMany(plant::class);
+    }
 
 
     /**

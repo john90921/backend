@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             ->hasComments(4)
             ->hasWorker()
             ->hasReplies(5)
+            ->hasPlants(3)
             ->count(10)
             ->create();
         User::factory()
@@ -32,6 +33,7 @@ class DatabaseSeeder extends Seeder
             ->hasComments(4)
             ->hasLikes(5)
             ->hasReplies(5)
+            ->hasPlants(3)
             ->count(10)
             ->create();
     }
