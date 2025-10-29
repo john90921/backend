@@ -22,5 +22,7 @@ WORKDIR /var/www/html
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN composer require resend/resend-laravel fakerphp/faker laravel/pint laravel/sail mockery/mockery nunomaduro/collision pestphp/pest pestphp/pest-plugin-laravel
 RUN composer install --no-dev --optimize-autoloader
-
+RUN mkdir -p storage/app/public/profiles
+RUN mkdir -p storage/app/public/posts
+RUN mkdir -p storage/app/public/plants
 CMD php artisan storage:link && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000
