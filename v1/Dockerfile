@@ -19,7 +19,7 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 COPY . /var/www/html
 
 WORKDIR /var/www/html
-
+RUN composer require --dev fakerphp/faker laravel/pint laravel/sail mockery/mockery nunomaduro/collision pestphp/pest pestphp/pest-plugin-laravel
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN composer install --no-dev --optimize-autoloader
 
