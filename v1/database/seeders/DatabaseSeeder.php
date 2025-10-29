@@ -24,11 +24,13 @@ class DatabaseSeeder extends Seeder
             ->hasWorker()
             ->hasReplies(5)
             ->hasPlants(3)
+            ->hasReports(2)
             ->count(10)
             ->create();
         User::factory()
             ->managerRole()
             ->hasProfile()
+            ->hasReports(2)
             ->hasPosts(8)
             ->hasComments(4)
             ->hasLikes(5)

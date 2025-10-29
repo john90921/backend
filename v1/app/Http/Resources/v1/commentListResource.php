@@ -19,6 +19,7 @@ class commentListResource extends JsonResource
             'id' => $this->id,
             'post_id' => $this->post_id,
             'owner_id' => $this->user_id,
+            'hide' => $this->hide,
             'content' => $this->content,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

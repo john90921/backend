@@ -37,5 +37,8 @@ class comment extends Model
     public function replies(){
         return $this->hasMany(reply::class);
     }
-
+    public function reports()
+    {
+        return $this->morphMany(report::class, 'reportable');
+    }
 }

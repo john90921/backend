@@ -1,16 +1,16 @@
 <?php
 
 namespace Database\Factories;
-use App\Models\User;
+
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\post;
 use App\Models\comment;
 use App\Models\reply;
-
+use App\Models\User;
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\like>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\report>
  */
-class LikeFactory extends Factory
+class ReportFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,8 +19,7 @@ class LikeFactory extends Factory
      */
     public function definition(): array
     {
-
-        $likeable = $this->faker->randomElement(
+         $reportable = $this->faker->randomElement(
             [
                 post::inRandomOrder()->first(),
                 comment::inRandomOrder()->first(),
@@ -29,9 +28,11 @@ class LikeFactory extends Factory
         );
 
         return [
-            "user_id" =>$likeable->user_id ?? User::factory(),
-            "likeable_id" => $likeable->id ?? post::factory(),
-            "likeable_type" => $likeable ? get_class($likeable): Post::class,
+            "user_id" =>$reportable->user_id ?? User::factory(),
+            "reportable_id" => $reportable->id ?? post::factory(),
+            "reportable_type" => $reportable ? get_class( $reportable): Post::class,
+            "reason" => $this->faker->sentence(),
+            "resolved" => $this->faker->boolean(),
         ];
     }
 }

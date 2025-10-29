@@ -18,7 +18,8 @@ class PostController extends Controller
      */
     public function index(Request $request)
     {
-        return $request->user()->posts()->paginate(10);
+        // return $request->user()->posts()->paginate(10);
+        return post::paginate(10);
     }
 
     public function retrievePostById(Request $request){
@@ -27,6 +28,7 @@ class PostController extends Controller
         ]);
 
         $post = post::query()
+            ->where("hide", false)
             ->with('user.profile')
             ->withCount(["likes as is_liked" => function ($query) use ($request){ $query->where("user_id", $request->user()->id);}])
             ->withCount("likes as total_likes")
@@ -36,7 +38,7 @@ class PostController extends Controller
         if (!$post) {
             return response()->json([
                 'status' => false,
-                'message' => 'Post not found',
+                'message' => 'Post not found or hidden',
                 'data' => null
             ], 404);
         }
@@ -76,6 +78,7 @@ class PostController extends Controller
     }
 
       $todayPosts->with('user.profile')
+              ->where("hide", false)
         ->withCount(["likes as is_liked" => function ($query) use ($request){ $query->where("user_id", $request->user()->id);}])
         ->withCount("likes as total_likes")
         ->withCount("comments as comments_count");// Eager load the user relationship // get the post owner user info
@@ -129,6 +132,7 @@ class PostController extends Controller
         $todayPosts = post::query()
         ->whereDate('created_at', Carbon::today())
         ->with('user.profile')
+        ->where("hide", false)
         ->withCount(["likes as is_liked" => function ($query) use ($request){ $query->where("user_id", $request->user()->id);}])
         ->withCount("likes as total_likes")
         ->withCount("comments as comments_count")// Eager load the user relationship // get the post owner user info

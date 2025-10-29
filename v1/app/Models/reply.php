@@ -35,6 +35,9 @@ class reply extends Model
     {
         return $this->morphMany(Like::class, 'likeable');
     }
-
+    public function reports()
+    {
+        return $this->morphMany(report::class, 'reportable');
+    }
 
 }

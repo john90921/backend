@@ -18,6 +18,7 @@ class replyListResource extends JsonResource
             'owner_id' => $this->user_id,
             'taged_user_id' => $this->taged_user_id,
             'comment_id' => $this->comment_id,
+            'hide' => $this->hide,
             'content' => $this->content,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

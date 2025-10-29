@@ -22,6 +22,8 @@ return new class extends Migration
             $table->foreignId(column: 'comment_id')
                 ->constrained('comments','id')
                 ->onDelete('cascade');
+            $table->boolean('hide')->default(false);
+
             $table->text('content');
             $table->timestamps();
         });

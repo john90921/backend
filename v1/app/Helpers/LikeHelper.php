@@ -19,7 +19,7 @@ if (!function_exists('toggle_like')) {
         if(!$model){
             return   response()->json(
             [
-                'message' => 'Post not found',
+                'message' => 'Not found',
                 'status' => false,
                 'data' => null
                 ]

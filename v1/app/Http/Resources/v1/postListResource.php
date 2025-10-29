@@ -19,6 +19,7 @@ class postListResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'content' => $this->content,
+            'hide' => $this->hide,
             'image' => $this->image ? asset('storage/' . $this->image) : null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

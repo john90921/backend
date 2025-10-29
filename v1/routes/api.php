@@ -12,7 +12,7 @@ use App\Events\PrivateMessageSent;
 use App\Http\Controllers\v1\NotificationController;
 use App\Http\Controllers\v1\UserController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-
+use App\Http\Controllers\v1\ReportController;
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -46,6 +46,10 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
         Route::resource('user', 'UserController')->middleware('auth:sanctum');
         Route::resource('post', 'PostController')->middleware(middleware: 'auth:sanctum');
         Route::post('retrievePostById', action: [PostController::class, 'retrievePostById'])->middleware('auth:sanctum');
+        Route::resource('report', 'ReportController')->middleware('auth:sanctum');
+        Route::get( 'postReports', [ReportController::class, 'postReports'])->middleware('auth:sanctum');
+        Route::get( 'commentReports', [ReportController::class, 'commentReports'])->middleware('auth:sanctum');
+        Route::get( 'replyReports', [ReportController::class, 'replyReports'])->middleware('auth:sanctum');
 
         Route::resource('comment', 'CommentController')->middleware('auth:sanctum');
         Route::resource('reply', 'ReplyController')->middleware('auth:sanctum');

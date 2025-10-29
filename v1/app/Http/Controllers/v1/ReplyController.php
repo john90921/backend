@@ -29,6 +29,7 @@ class ReplyController extends Controller
         ]);
         try{
          $newReply = reply::query()
+            ->where("hide", false)
             ->where('comment_id', $data['comment_id'])
             ->with('user.profile')
             ->with('taggedUser.profile')
