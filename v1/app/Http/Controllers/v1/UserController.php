@@ -104,10 +104,9 @@ class UserController extends Controller
             'name' => 'required|string',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string',
-
         ]);
         // $randomPassword = Str::random(12);
-        if($data['email'])
+        // if($data['email'])
 
         $password = $data['password'];
         // $userData = [
@@ -116,7 +115,12 @@ class UserController extends Controller
         //     'password' => Hash::make($password),
         //     'department' => $data['department'] ?? 'general',
         // ];
-
+        if(User::where('email', $data['email'])->exists()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Email already in use',
+            ], );
+        }
         $user = User::create( [
             'name' =>  $data['name'],
             'email' => $data['email'],
@@ -137,12 +141,12 @@ class UserController extends Controller
                 ]
             );
         }
-        $otp = rand(1000, 9999); // 4-digit OTP
+        // $otp = rand(1000, 9999); // 4-digit OTP
 
-        $user->otp = $otp;
+        // $user->otp = $otp;
 
-        $user->save();
-        Mail::to($user->email)->send( new OtpEmail(otp: $otp));
+        // $user->save();
+        // Mail::to($user->email)->send( new OtpEmail(otp: $otp));
 
         //   $token  = $user->createToken('mobile')->plainTextToken;
         // // Mail::to($user->email)->send(new WelcomeEmail($user, $password));

@@ -40,6 +40,14 @@ class AuthController extends Controller
         //     ], 200);
 
         // }
+                // $user->save();
+        // Mail::to($user->email)->send( new OtpEmail(otp: $otp));
+        //     return response()->json([
+        //         'message' => 'unverified',
+        //         'status' => false
+        //     ], 200);
+
+        // }
         $token  = $user->createToken('mobile')->plainTextToken; // get the token
 
 
