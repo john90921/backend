@@ -27,19 +27,19 @@ class AuthController extends Controller
         ], 200);
         }
 
-         if(!$user->hasVerifiedEmail()){
-        $otp = rand(1000, 9999); // 4-digit OTP
+        //  if(!$user->hasVerifiedEmail()){
+        // $otp = rand(1000, 9999); // 4-digit OTP
 
-        $user->otp = $otp;
+        // $user->otp = $otp;
 
-        $user->save();
-        Mail::to($user->email)->send( new OtpEmail(otp: $otp));
-            return response()->json([
-                'message' => 'unverified',
-                'status' => false
-            ], 200);
-        
-        }
+        // $user->save();
+        // Mail::to($user->email)->send( new OtpEmail(otp: $otp));
+        //     return response()->json([
+        //         'message' => 'unverified',
+        //         'status' => false
+        //     ], 200);
+
+        // }
         $token  = $user->createToken('mobile')->plainTextToken; // get the token
 
 
