@@ -9,7 +9,7 @@ use App\Models\User;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\reply>
  */
-class ReplyFactory extends Factory
+class replyFactory extends Factory
 {
     /**
      * Define the model's default state.

@@ -10,7 +10,7 @@ use App\Models\reply;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\like>
  */
-class LikeFactory extends Factory
+class likeFactory extends Factory
 {
     /**
      * Define the model's default state.
