@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class like extends Model
 {
     /** @use HasFactory<\Database\Factories\LikeFactory> */
-    use HasFactory;
+    use HasFactory; //sad
 
     protected $fillable = [
         'user_id',
