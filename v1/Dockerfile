@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Copy application files asa sdd huuh
+# Copy application files asa sdd huuh //jij
 COPY . /var/www/html
 
 WORKDIR /var/www/html
