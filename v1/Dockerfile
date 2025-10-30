@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     curl
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd curl
 
 # Copy application files asa sdd huuh //jij
 COPY . /var/www/html
