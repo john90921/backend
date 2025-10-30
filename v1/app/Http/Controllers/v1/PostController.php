@@ -93,7 +93,6 @@ class PostController extends Controller
         $todayPosts->orderBy('total_likes', 'desc');
         }
 
-
     }
 
  if($request->has('searchInput')){
@@ -168,7 +167,7 @@ class PostController extends Controller
         $data = $request->validate([
             'title' => 'required|string',
             'content' => 'required|string',
-            'image' =>'sometimes|nullable',
+            'image' =>'sometimes|nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if ($request->hasFile('image') || $request->file('image')!= null ) {
