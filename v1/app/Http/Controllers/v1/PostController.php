@@ -10,6 +10,8 @@ use Carbon\Carbon;
 use  App\Http\Resources\v1\postListResource;
 use App\Http\Resources\v1\postResource;
 use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Support\Facades\Http;
 
 class PostController extends Controller
 {
@@ -167,15 +169,32 @@ class PostController extends Controller
         $data = $request->validate([
             'title' => 'required|string',
             'content' => 'required|string',
-            'image' =>'sometimes|nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' =>'sometimes|nullable',
         ]);
 
-        if ($request->hasFile('image') || $request->file('image')!= null ) {
-        $uploadFolder = 'posts';
-        $image = $request->file('image');
-        $image_uploaded_path = $image->store( $uploadFolder, 'public');
+        if ($request->hasFile('image') && $request->file('image')!= null ) {
+        // $uploadFolder = 'posts';
+            // return $request->file('image')->getRealPath();
+
+        // $image_uploaded_path = $image->store( $uploadFolder, 'public');
+// dd(Cloudinary::upload('public/test.jpg')->getSecurePath());
+ $image = $request->file('image');
+        $imageBase64 = base64_encode(file_get_contents($image));
+ $response = Http::asForm()->post('https://api.imgbb.com/1/upload', [
+            'key' => env('IMGBB_API_KEY'),
+            'image' => $imageBase64,
+        ]);
+    // $image_uploaded_path = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+ $dataImage = $response->json();
+
+       if (!isset($dataImage['data']['url'])) {
+
+        return response()->json(['status' => false,'message' => 'Image upload failed','data' => null], 500);
+
        }
 
+        $image_uploaded_path = $dataImage['data']['url'];
+       }
 
         try {
            $post = post::create([
@@ -189,7 +208,8 @@ class PostController extends Controller
         } catch (\Exception $e) {
             return response()->json(['status' => false,'message' => $e->getMessage(),'data' => null], 500);
         }
-    }
+         }
+
 
     /**
      * Display the specified resource.
@@ -236,9 +256,18 @@ class PostController extends Controller
         }
 
         if ($request->hasFile('image')) {
-        $uploadFolder = 'posts';
         $image = $request->file('image');
-        $image_uploaded_path = $image->store( $uploadFolder, 'public');
+        $imageBase64 = base64_encode(file_get_contents($image));
+ $response = Http::asForm()->post('https://api.imgbb.com/1/upload', [
+            'key' => env('IMGBB_API_KEY'),
+            'image' => $imageBase64,
+        ]);
+    // $image_uploaded_path = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+ $dataImage = $response->json();
+ $image_uploaded_path = $dataImage['data']['url'];
+
+
+
         $data['image'] = $image_uploaded_path;
         }
 

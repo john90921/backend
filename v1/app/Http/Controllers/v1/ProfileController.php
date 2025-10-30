@@ -10,6 +10,7 @@ use App\Http\Controllers\v1\Controller;
 use App\Http\Resources\v1\userResource;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 
 class ProfileController extends Controller
@@ -36,10 +37,27 @@ class ProfileController extends Controller
      */
     public function store(StoreprofileRequest $request)
   {
+            $image_uploaded_path = null;
+
         if ($request->hasFile('profile_image')) {
-        $uploadFolder = 'profiles';
-        $image = $request->file('profile_image');
-        $image_uploaded_path = $image->store( $uploadFolder, 'public');
+$image = $request->file('profile_image');
+        $imageBase64 = base64_encode(file_get_contents($image));
+ $response = Http::asForm()->post('https://api.imgbb.com/1/upload', [
+            'key' => env('IMGBB_API_KEY'),
+            'image' => $imageBase64,
+        ]);
+    // $image_uploaded_path = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+ $dataImage = $response->json();
+ if (!isset($dataImage['data']['url'])) {
+
+        return response()->json(['status' => false,'message' => 'Image upload failed','data' => null], 500);
+
+       }
+
+
+        $image_uploaded_path = $dataImage['data']['url'];
+
+
        }
 
         return profile::create([
@@ -84,10 +102,23 @@ class ProfileController extends Controller
             $profile->profile_image = null;
         }
         if($request->hasFile('profile_image')){//check if image present
-            $uploadFolder = 'profiles';  //folder name
-            $image = $request->file('profile_image'); // get image // if text, than use $request->all(), if file, use $request->file('key')
-            $image_uploaded_path = $image->store($uploadFolder, 'public'); // store image in public disk (storage/app/public)
+          $image = $request->file('profile_image');
+        $imageBase64 = base64_encode(file_get_contents($image));
+ $response = Http::asForm()->post('https://api.imgbb.com/1/upload', [
+            'key' => env('IMGBB_API_KEY'),
+            'image' => $imageBase64,
+        ]);
+    // $image_uploaded_path = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+ $dataImage = $response->json();
+      if (!isset($dataImage['data']['url'])) {
+
+        return response()->json(['status' => false,'message' => 'Image upload failed','data' => null], 500);
+
+       }
+ $image_uploaded_path = $dataImage['data']['url'];
+
             $data['profile_image'] = $image_uploaded_path;
+
         }
 
     $profile->update($data);

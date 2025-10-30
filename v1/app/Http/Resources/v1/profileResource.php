@@ -19,7 +19,7 @@ class profileResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'profile_image' => $this->profile_image // check if profile_image is not null
-            ? asset('storage/' . $this->profile_image): null, // if you want to return full URL // make it to become http://127.0.0.1:8000/storage/profile/avatar.png
+            ? $this->profile_image: null, // if you want to return full URL // make it to become http://127.0.0.1:8000/storage/profile/avatar.png
 
         ];
     }

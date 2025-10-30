@@ -20,7 +20,7 @@ class postListResource extends JsonResource
             'title' => $this->title,
             'content' => $this->content,
             'hide' => $this->hide,
-            'image' => $this->image ? asset('storage/' . $this->image) : null,
+            'image' => $this->image ?  $this->image : null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'is_liked' => (bool) $this->is_liked,
@@ -28,7 +28,7 @@ class postListResource extends JsonResource
             'comments_count' => $this->comments_count ?? 0,
             'owner_id' => $this->user->id,
             'owner_name' => $this->user->profile?->name ?? null,
-            'owner_image' => $this->user->profile?->profile_image ? asset('storage/' . $this->user->profile->profile_image) : null,
+            'owner_image' => $this->user->profile?->profile_image ? $this->user->profile->profile_image : null,
         ];
     }
 }

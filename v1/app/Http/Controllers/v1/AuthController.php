@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\OtpEmail;
 use Illuminate\Support\Facades\Mail;
+
 class AuthController extends Controller
 {
     public function login(Request $request)
