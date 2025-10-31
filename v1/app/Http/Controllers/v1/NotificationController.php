@@ -4,14 +4,14 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\v1\Controller;
 use App\Models\Notification;
-use App\Http\Resources\v1\NotificationListResource;
+use App\Http\Resources\v1\notificationListResource;
 use Illuminate\Http\Request;
 class NotificationController extends Controller
 {
     public function index(){
         // return request()->user()->notifications;
         try{
-                 return response()->json(['status' => true,'message' => 'Notification fetched successfully','data' => NotificationListResource::collection(request()->user()->notifications()->paginate(10))], 200);
+            return response()->json(['status' => true,'message' => 'Notification fetched successfully','data' => notificationListResource::collection(request()->user()->notifications()->paginate(10))], 200);
         }
         catch(\Exception $e){
             return response()->json(['status' => false,'message' => 'Notification not fetched successfully', 'error' => $e->getMessage()], 500);
