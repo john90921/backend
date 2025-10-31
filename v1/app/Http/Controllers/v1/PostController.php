@@ -165,42 +165,42 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $image_uploaded_path = null;
+
         $data = $request->validate([
             'title' => 'required|string',
             'content' => 'required|string',
-            'image' =>'sometimes|nullable',
+            'image' =>'sometimes|nullable|String',
         ]);
 
-        if ($request->hasFile('image') && $request->file('image')!= null ) {
-        // $uploadFolder = 'posts';
-            // return $request->file('image')->getRealPath();
+//         if ($request->hasFile('image') && $request->file('image')!= null ) {
+//         // $uploadFolder = 'posts';
+//             // return $request->file('image')->getRealPath();
 
-        // $image_uploaded_path = $image->store( $uploadFolder, 'public');
-// dd(Cloudinary::upload('public/test.jpg')->getSecurePath());
- $image = $request->file('image');
-        $imageBase64 = base64_encode(file_get_contents($image));
- $response = Http::asForm()->post('https://api.imgbb.com/1/upload', [
-            'key' => env('IMGBB_API_KEY'),
-            'image' => $imageBase64,
-        ]);
-    // $image_uploaded_path = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
- $dataImage = $response->json();
+//         // $image_uploaded_path = $image->store( $uploadFolder, 'public');
+// // dd(Cloudinary::upload('public/test.jpg')->getSecurePath());
+//  $image = $request->file('image');
+//         $imageBase64 = base64_encode(file_get_contents($image));
+//  $response = Http::asForm()->post('https://api.imgbb.com/1/upload', [
+//             'key' => env('IMGBB_API_KEY'),
+//             'image' => $imageBase64,
+//         ]);
+//     // $image_uploaded_path = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+//  $dataImage = $response->json();
 
-       if (!isset($dataImage['data']['url'])) {
+//        if (!isset($dataImage['data']['url'])) {
 
-        return response()->json(['status' => false,'message' => 'Image upload failed','data' => null], 500);
+//         return response()->json(['status' => false,'message' => 'Image upload failed','data' => null], 500);
 
-       }
+//        }
 
-        $image_uploaded_path = $dataImage['data']['url'];
-       }
+//         $image_uploaded_path = $dataImage['data']['url'];
+//        }
 
         try {
            $post = post::create([
             'title' => $data['title'],
             'content' => $data['content'],
-            'image' => $image_uploaded_path,
+            'image' => $data['image'] ?? null,
             'user_id' => $request->user()->id
            ]);
             return response()->json(['status' => true,'message' => 'post created successfully','data' =>new postListResource($post)], 201);
@@ -253,23 +253,24 @@ class PostController extends Controller
             //     Storage::disk('public')->delete($post->image);
             // }
             $post->image = null;
+            $post->save();
         }
 
-        if ($request->hasFile('image')) {
-        $image = $request->file('image');
-        $imageBase64 = base64_encode(file_get_contents($image));
- $response = Http::asForm()->post('https://api.imgbb.com/1/upload', [
-            'key' => env('IMGBB_API_KEY'),
-            'image' => $imageBase64,
-        ]);
-    // $image_uploaded_path = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
- $dataImage = $response->json();
- $image_uploaded_path = $dataImage['data']['url'];
+//         if ($request->hasFile('image')) {
+//         $image = $request->file('image');
+//         $imageBase64 = base64_encode(file_get_contents($image));
+//  $response = Http::asForm()->post('https://api.imgbb.com/1/upload', [
+//             'key' => env('IMGBB_API_KEY'),
+//             'image' => $imageBase64,
+//         ]);
+//     // $image_uploaded_path = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+//  $dataImage = $response->json();
+//  $image_uploaded_path = $dataImage['data']['url'];
 
 
 
-        $data['image'] = $image_uploaded_path;
-        }
+//         $data['image'] = $image_uploaded_path;
+//         }
 
 
         $post->update($data);
