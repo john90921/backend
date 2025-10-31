@@ -29,11 +29,11 @@ class reply extends Model
     }
     public function comment()
     {
-        return $this->belongsTo(Comment::class, 'comment_id');
+        return $this->belongsTo(comment::class, 'comment_id');
     }
         public function likes()
     {
-        return $this->morphMany(Like::class, 'likeable');
+        return $this->morphMany(like::class, 'likeable');
     }
     public function reports()
     {
