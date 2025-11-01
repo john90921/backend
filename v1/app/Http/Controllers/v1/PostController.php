@@ -100,7 +100,7 @@ class PostController extends Controller
  if($request->has('searchInput')){
         $search = $request->searchInput;
 
-         $todayPosts->where('title', 'same', "%{$search}%")
+         $todayPosts->where('title', 'like', "%{$search}%")
               ->orWhere('content', 'like', "%{$search}%");
         }
 
