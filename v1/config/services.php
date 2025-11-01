@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'hms' => [
+        'client_id' => env('HMS_CLIENT_ID'),
+        'client_secret' => env('HMS_CLIENT_SECRET'),
+    ],
+
+    'huawei' => [
+        'app_id' => env('HUAWEI_APP_ID'),
+        'app_secret' => env('HUAWEI_APP_SECRET'),
+        'verify_token' => env('HUAWEI_VERIFY_TOKEN', false), // Set to true for production
+    ],
+
 ];

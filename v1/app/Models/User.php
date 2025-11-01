@@ -23,9 +23,17 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'password',
         'email',
+        'password',
         'role',
         'email_verified_at',
-        'otp'
+        'otp',
+        'push_token',
+        'push_platform',
+        'huawei_open_id',
+        'huawei_union_id',
+        'display_name',
+        'avatar_uri',
+        'auth_provider'
     ];
 
 
@@ -41,32 +49,40 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
 
-    public function profile(){
+    public function profile()
+    {
         return $this->hasOne(profile::class);
     }
-    public function worker(){
+    public function worker()
+    {
         return $this->hasOne(worker::class);
     }
-    public function posts(){
+    public function posts()
+    {
         return $this->hasMany(post::class);
-}
-    public function likes(){
+    }
+    public function likes()
+    {
         return $this->hasMany(like::class);
     }
-    public function comments(){
+    public function comments()
+    {
         return $this->hasMany(comment::class);
     }
-    public function replies(){
+    public function replies()
+    {
         return $this->hasMany(reply::class);
     }
-    public function tageReplies(){
-        return $this->hasMany(reply::class,'taged_user_id');
+    public function tageReplies()
+    {
+        return $this->hasMany(reply::class, 'taged_user_id');
     }
     public function plants()
     {
         return $this->hasMany(plant::class);
     }
-    public function reports(){
+    public function reports()
+    {
         return $this->hasMany(report::class);
     }
 
