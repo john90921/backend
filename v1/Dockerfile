@@ -27,4 +27,4 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN composer require resend/resend-laravel fakerphp/faker laravel/pint laravel/sail mockery/mockery nunomaduro/collision pestphp/pest pestphp/pest-plugin-laravel
 RUN composer install --no-dev --optimize-autoloader
 
-CMD php artisan storage:link && php artisan migrate:refresh && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000
+CMD php artisan migrate:refresh && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000
