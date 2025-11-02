@@ -29,8 +29,8 @@ class postListResource extends JsonResource
             'owner_id' => $this->user->id,
             'owner_name' => $this->user->profile?->name ?? null,
             'owner_image' => $this->user->profile?->profile_image ? $this->user->profile->profile_image : null,
-            'state' => $this->state,
-            'city' => $this->city,
+            'state' => $this->state ?? null,
+            'city' => $this->city ?? null,
         ];
     }
 }
