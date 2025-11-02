@@ -170,6 +170,8 @@ class PostController extends Controller
             'title' => 'required|string',
             'content' => 'required|string',
             'image' =>'sometimes|nullable|String',
+            'state' => 'sometimes|nullable|string',
+            'city' => 'sometimes|nullable|string',
         ]);
 
 //         if ($request->hasFile('image') && $request->file('image')!= null ) {
@@ -201,7 +203,9 @@ class PostController extends Controller
             'title' => $data['title'],
             'content' => $data['content'],
             'image' => $data['image'] ?? null,
-            'user_id' => $request->user()->id
+            'user_id' => $request->user()->id,
+            'state' => $data['state'] ?? null,
+            'city' => $data['city'] ?? null
            ]);
             return response()->json(['status' => true,'message' => 'post created successfully','data' =>new postListResource($post)], 201);
 

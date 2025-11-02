@@ -15,6 +15,8 @@ class post extends Model
         'content',
         'image',
         'user_id',
+        'state'
+        ,'city'
     ];
 
     protected $casts = [
