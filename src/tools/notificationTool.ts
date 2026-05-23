@@ -12,12 +12,17 @@ export const adviceTool = tool(
       let result = await con.query(
         `
      SELECT json_build_object(
- 'goal',
+    'goal',
     (
         SELECT json_agg(g)
         FROM goals g
         WHERE g.user_id = 7
     ),
+    'user',(
+	SELECT json_agg(u)
+        FROM users u
+        WHERE u.user_id = 7
+	),
     -- Overall totals
     'total_expenses',
     (
@@ -147,9 +152,18 @@ export const adviceTool = tool(
     , [context.userId]);
 
       const expenseSummary = result.rows[0].expense_summary;
-   return `
-     Give financial advice based on user financial data and conversation context, the user financial data is ${JSON.stringify(expenseSummary)}. Please provide specific and actionable advice to help the user manage their finances better.
-    `;
+   `
+Generate ONLY ONE short financial notification message for the user based on this financial summary:
+${JSON.stringify(expenseSummary)}
+
+Rules:
+- Maximum 1 sentence
+- Short and actionable
+- Friendly tone
+- No markdown
+- No explanation
+- No multiple suggestions
+`;
 
     } catch (err) {
       console.error("error", err);
